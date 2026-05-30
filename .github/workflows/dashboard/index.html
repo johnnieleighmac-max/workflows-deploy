@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Home Commando">
+    <title>Home Commando 2.0</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --accent: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #c0392b;
+            --light-bg: #f5f5f5;
+            --card-bg: #ffffff;
+            --text: #2c3e50;
+            --border: #ecf0f1;
+            color-scheme: light;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--light-bg);
+            color: var(--text);
+            padding: 16px;
+            padding-bottom: 32px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 24px;
+            padding-top: 8px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--primary);
+        }
+
+        .week-info {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 12px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tab-btn {
+            padding: 12px 16px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #7f8c8d;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .tab-btn:hover {
+            color: var(--text);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #7f8c8d;
+            margin-bottom: 12px;
+        }
+
+        .card-content {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .priority-item {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .priority-item:last-child {
+            border-bottom: none;
+        }
+
+        .priority-label {
+            font-weight: 600;
+            color: var(--primary);
+            margin-right: 8px;
+        }
+
+        .alert {
+            background: #fff3cd;
+            border-left: 4px solid var(--warning);
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            margin: 12px 0;
+        }
+
+        .alert.danger {
+            background: #f8d7da;
+            border-left-color: var(--danger);
+        }
+
+        .alert.success {
+            background: #d4edda;
+            border-left-color: var(--success);
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .status-dot.urgent {
+            background: var(--danger);
+        }
+
+        .status-dot.upcoming {
+            background: var(--warning);
+        }
+
+        .status-dot.normal {
+            background: var(--success);
+        }
+
+        .event {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .event:last-child {
+            border-bottom: none;
+        }
+
+        .event-time {
+            font-weight: 600;
+            color: var(--accent);
+            display: block;
+            font-size: 12px;
+        }
+
+        .meal-option {
+            background: #f9f9f9;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            margin: 8px 0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .meal-option:hover {
+            border-color: var(--accent);
+            background: #fffbf9;
+        }
+
+        .meal-option.selected {
+            border-color: var(--success);
+            background: #f0fdf4;
+        }
+
+        .meal-option-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 6px;
+        }
+
+        .meal-option-name {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .meal-option-cost {
+            font-size: 12px;
+            color: #7f8c8d;
+            background: #fff;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .meal-option-ingredients {
+            font-size: 12px;
+            color: #7f8c8d;
+            line-height: 1.4;
+        }
+
+        .checkbox {
+            cursor: pointer;
+            margin-right: 8px;
+        }
+
+        .two-col {
+            grid-column: span 2;
+        }
+
+        .refresh-btn {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .refresh-btn:hover {
+            opacity: 0.9;
+        }
+
+        .loading {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 20px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .two-col {
+                grid-column: span 1;
+            }
+            h1 {
+                font-size: 22px;
+            }
+            .tab-btn {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+        }
+
+        footer {
+            text-align: center;
+            font-size: 12px;
+            color: #95a5a6;
+            margin-top: 32px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏠 Home Commando 2.0</h1>
+            <p class="week-info" id="week-info">Week of May 26 – June 1, 2026</p>
+            <button class="refresh-btn" onclick="location.reload()">↻ Refresh</button>
+        </header>
+
+        <div class="tab-buttons">
+            <button class="tab-btn active" onclick="switchTab('daily')">📱 Daily</button>
+            <button class="tab-btn" onclick="switchTab('weekly')">📊 Weekly</button>
+            <button class="tab-btn" onclick="switchTab('meals')">🍽️ Meals</button>
+        </div>
+
+        <!-- DAILY TAB -->
+        <div id="daily" class="tab-content active">
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">🎯 Today's Rule of 3</div>
+                    <div class="card-content" id="daily-priorities">
+                        <div class="priority-item">
+                            <span class="status-dot urgent"></span>
+                            <span class="priority-label">#1 Sobriety & Health</span>
+                        </div>
+                        <div class="priority-item">
+                            <span class="status-dot upcoming"></span>
+                            <span class="priority-label">#2 Today's Task</span>
+                        </div>
+                        <div class="priority-item">
+                            <span class="status-dot normal"></span>
+                            <span class="priority-label">#3 Household</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">📅 Today's Calendar</div>
+                    <div class="card-content" id="daily-calendar">
+                        <p style="font-size: 13px; color: #7f8c8d;">Loading calendar...</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">⚠️ Alerts</div>
+                    <div class="card-content" id="daily-alerts">
+                        <p style="font-size: 13px; color: #7f8c8d;">No urgent alerts.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">💳 Bills Due (Next 7 Days)</div>
+                    <div class="card-content" id="daily-bills">
+                        <p style="font-size: 13px; color: #7f8c8d;">No bills due this week.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- WEEKLY TAB -->
+        <div id="weekly" class="tab-content">
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">🎯 Rule of 3: This Week</div>
+                    <div class="card-content">
+                        <div class="priority-item">
+                            <span class="status-dot urgent"></span>
+                            <span class="priority-label">#1 Sobriety & Health</span>
+                            <span style="font-size: 13px; color: #7f8c8d;">Daily practice. Non-negotiable.</span>
+                        </div>
+                        <div class="priority-item">
+                            <span class="status-dot urgent"></span>
+                            <span class="priority-label">#2 Nelnet Loan Due Date</span>
+                            <span style="font-size: 13px; color: #7f8c8d;">Log into studentaid.gov. Set up autopay (~$250/mo).</span>
+                        </div>
+                        <div class="priority-item">
+                            <span class="status-dot upcoming"></span>
+                            <span class="priority-label">#3 Summer Camp Deadline</span>
+                            <span style="font-size: 13px; color: #7f8c8d;">Castaic HS registration closes June 5. Check with Morgan & Peyton.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">📅 Week Ahead</div>
+                    <div class="card-content" id="weekly-calendar">
+                        <p style="font-size: 13px; color: #7f8c8d;">Loading week view...</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">👨‍👩‍👧‍👦 Family Check-In</div>
+                    <div class="card-content">
+                        <div class="priority-item">
+                            <strong>Morgan (15)</strong><br>
+                            <span style="font-size: 13px; color: #7f8c8d;">Check summer sports schedule. Registration closing.</span>
+                        </div>
+                        <div class="priority-item">
+                            <strong>Peyton (13)</strong><br>
+                            <span style="font-size: 13px; color: #7f8c8d;">Summer camps—confirm interest by Jun 5.</span>
+                        </div>
+                        <div class="priority-item">
+                            <strong>Mike</strong><br>
+                            <span style="font-size: 13px; color: #7f8c8d;">Diabetes check-in. Recent updates?</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">🚀 Career Pivot</div>
+                    <div class="card-content">
+                        <div class="alert success">Resume & LinkedIn profile active.</div>
+                        <p style="font-size: 13px; color: #7f8c8d;">Check City of Santa Clarita jobs weekly. Focus: nonprofit development, program management.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">💚 Wellbeing</div>
+                    <div class="card-content">
+                        <div class="priority-item">
+                            <strong>7pm Daily:</strong> <span style="font-size: 13px; color: #7f8c8d;">Attitude of gratitude.</span>
+                        </div>
+                        <div class="priority-item">
+                            <strong>Sunday:</strong> <span style="font-size: 13px; color: #7f8c8d;">Church + quiet time.</span>
+                        </div>
+                        <div class="priority-item">
+                            <strong>Reading:</strong> <span style="font-size: 13px; color: #7f8c8d;">Paper books. Your reset.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card two-col">
+                    <div class="card-title">✅ Next Actions (Ranked)</div>
+                    <div class="card-content">
+                        <div class="priority-item">
+                            <span class="status-dot urgent"></span>
+                            <strong style="color: var(--danger);">TODAY:</strong> Log into studentaid.gov. Confirm due date. Set autopay reminder.
+                        </div>
+                        <div class="priority-item">
+                            <span class="status-dot urgent"></span>
+                            <strong style="color: var(--danger);">THIS WEEK:</strong> Text Morgan & Peyton about summer camps. Deadline June 5.
+                        </div>
+                        <div class="priority-item">
+                            <span class="status-dot upcoming"></span>
+                            <strong style="color: var(--warning);">NEXT WEEK:</strong> Check City of Santa Clarita jobs board.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MEALS TAB -->
+        <div id="meals" class="tab-content">
+            <div class="grid">
+                <div class="card two-col">
+                    <div class="card-title">🍽️ Saturday Meal Planner</div>
+                    <div style="margin-bottom: 16px; font-size: 13px; color: #7f8c8d;">
+                        Pick 4 meals for the week. Your selections will auto-generate a grocery list Sunday.
+                    </div>
+                    <div id="meal-options">
+                        <div class="loading">Loading meal options based on your pantry...</div>
+                    </div>
+                </div>
+
+                <div class="card two-col">
+                    <div class="card-title">📋 Your Selections (4 meals)</div>
+                    <div id="meal-selections">
+                        <p style="font-size: 13px; color: #7f8c8d;">No meals selected yet.</p>
+                    </div>
+                </div>
+
+                <div class="card two-col">
+                    <div class="card-title">🛒 Generated Grocery List (Sunday)</div>
+                    <div id="grocery-list">
+                        <p style="font-size: 13px; color: #7f8c8d;">Select your meals to generate your grocery list.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            Last updated: <span id="last-updated">May 30, 2026</span> · Home Commando 2.0
+        </footer>
+    </div>
+
+    <script>
+        // Tab switching
+        function switchTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-content');
+            const buttons = document.querySelectorAll('.tab-btn');
+
+            tabs.forEach(tab => tab.classList.remove('active'));
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Sample meal options (replace with API call to your meal database)
+        const mealOptions = [
+            { name: 'Chicken Stir-Fry', cost: '$8.50', ingredients: 'Chicken breast, broccoli, carrots, soy sauce' },
+            { name: 'Pasta Primavera', cost: '$6.00', ingredients: 'Pasta, seasonal veggies, olive oil, garlic' },
+            { name: 'Beef Tacos', cost: '$10.00', ingredients: 'Ground beef, tortillas, lettuce, tomato, cheese' },
+            { name: 'Salmon with Asparagus', cost: '$14.00', ingredients: 'Salmon fillet, asparagus, lemon, olive oil' },
+            { name: 'Vegetable Soup', cost: '$5.50', ingredients: 'Mixed veggies, broth, beans, herbs' },
+            { name: 'Chicken Quesadilla', cost: '$7.00', ingredients: 'Chicken, tortillas, cheese, peppers, onions' },
+            { name: 'Spaghetti & Meatballs', cost: '$9.00', ingredients: 'Pasta, ground beef, tomato sauce, garlic' },
+            { name: 'Buddha Bowl', cost: '$8.00', ingredients: 'Quinoa, chickpeas, kale, sweet potato, tahini' },
+        ];
+
+        let selectedMeals = [];
+
+        function renderMealOptions() {
+            const container = document.getElementById('meal-options');
+            container.innerHTML = mealOptions.map((meal, idx) => `
+                <div class="meal-option" onclick="toggleMeal(${idx})">
+                    <div class="meal-option-header">
+                        <div class="meal-option-name">${meal.name}</div>
+                        <div class="meal-option-cost">${meal.cost}</div>
+                    </div>
+                    <div class="meal-option-ingredients">${meal.ingredients}</div>
+                </div>
+            `).join('');
+        }
+
+        function toggleMeal(idx) {
+            const meal = mealOptions[idx];
+            if (selectedMeals.some(m => m.name === meal.name)) {
+                selectedMeals = selectedMeals.filter(m => m.name !== meal.name);
+            } else if (selectedMeals.length < 4) {
+                selectedMeals.push(meal);
+            } else {
+                alert('You can only select 4 meals per week.');
+                return;
+            }
+
+            updateSelections();
+            renderMealOptions();
+        }
+
+        function updateSelections() {
+            const container = document.getElementById('meal-selections');
+            if (selectedMeals.length === 0) {
+                container.innerHTML = '<p style="font-size: 13px; color: #7f8c8d;">No meals selected yet.</p>';
+            } else {
+                container.innerHTML = `
+                    <div style="font-size: 13px; line-height: 1.8;">
+                        ${selectedMeals.map(m => `<div>✓ ${m.name} (${m.cost})</div>`).join('')}
+                        <div style="margin-top: 12px; font-weight: 600; color: var(--primary);">
+                            Total: $${(selectedMeals.reduce((sum, m) => sum + parseFloat(m.cost.slice(1)), 0)).toFixed(2)}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function updateWeekInfo() {
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+            const monday = new Date(today.setDate(diff));
+            const sunday = new Date(monday);
+            sunday.setDate(sunday.getDate() + 6);
+
+            const opts = { month: 'short', day: 'numeric' };
+            const weekStr = `Week of ${monday.toLocaleDateString('en-US', opts)} – ${sunday.toLocaleDateString('en-US', opts)}, ${sunday.getFullYear()}`;
+            document.getElementById('week-info').textContent = weekStr;
+            document.getElementById('last-updated').textContent = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        // Initialize
+        updateWeekInfo();
+        renderMealOptions();
+    </script>
+</body>
+</html>
